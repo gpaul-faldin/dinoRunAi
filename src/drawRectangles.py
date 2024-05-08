@@ -63,8 +63,11 @@ class OpenCVParse:
       retContours = []
       for i in range(len(sortedContours)):
         x, y, w, h = cv2.boundingRect(sortedContours[i])
-        if (x < 530 and y > 5):
-          retContours.append(sortedContours[i])
+
+        if x > 500 and y < 15:
+            continue
+        else:
+            retContours.append(sortedContours[i])
       boudingRects = [cv2.boundingRect(contour) for contour in retContours]
       return boudingRects
 
@@ -81,7 +84,7 @@ class OpenCVParse:
       }
       for rectangle in mergedRects:
         x, y, w, h = rectangle
-        if ((x <= 2) and ((w == 41 and h < 50) or (w == 55 and h == 27))):
+        if ((x < 28) and ((w == 41 and h < 50) or (w == 55 and h == 27))):
           parsedRects["dino"] = {
             "x": x,
             "y": y,
@@ -100,7 +103,11 @@ class OpenCVParse:
     def getScore(self):
       originalImage = self.createMat()
       cropped = originalImage[0: 30, 545: 610]
-      return pytesseract.image_to_string(cropped)
+      score: str = pytesseract.image_to_string(cropped)
+      score = score.strip()
+      if (score == '' or int(score) < 5):
+        return 0
+      return int(score)
 
     def drawRectangle(self):
 
