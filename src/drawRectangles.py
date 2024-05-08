@@ -85,7 +85,7 @@ class OpenCVParse:
       }
       for rectangle in mergedRects:
         x, y, w, h = rectangle
-        if ((x < 28) and ((w == 41 and h < 50))):
+        if ((w == 41 and h < 50)):
           parsedRects["dino"] = {
             "x": x,
             "y": y,
