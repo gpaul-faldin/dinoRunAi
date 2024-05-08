@@ -21,7 +21,8 @@ class AsyncPWInteraction:
 
   async def closeBrowser(self):
     await self.browser.close()
-    
+    await self.playwright.stop()
+
   async def checkSC(self):
     await self.page.screenshot(path="check.png")
 
@@ -39,6 +40,7 @@ async def main():
     await asyncPWClass.init()
     openCVClass = OpenCVParse(None)
     running = False
+    score = 0
 
     try:
         while True:
@@ -50,22 +52,29 @@ async def main():
             if key == 113:  # 'q' key
                 break
             elif key == 32:  # Spacebar key
-                asyncio.create_task(asyncPWClass.jump())
+                task = asyncio.create_task(asyncPWClass.jump())
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
             elif key == 100:  # 'd' key
-                asyncio.create_task(asyncPWClass.jump("half"))
+                task = asyncio.create_task(asyncPWClass.jump("half"))
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    pass
             if (running == False and openCVClass.getScore() < 5):
-              continue
+                continue
             else:
-              running = True
+                running = True
             if (info['dino']['y'] == 0):
-              score = openCVClass.getScore()
-              break
-    except asyncio.CancelledError:
-        pass
-    finally:
-        # print(score)
+                score = openCVClass.getScore()
+                break
+        print(score)
         print(info)
+    finally:
         await asyncPWClass.closeBrowser()
         cv2.destroyAllWindows()
+    return 0
 
 asyncio.run(main())
