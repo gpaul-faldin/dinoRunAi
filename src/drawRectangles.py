@@ -40,9 +40,10 @@ class OpenCVParse:
                 "height": rects[i][3]
             }
 
-            if (nextRect["x"] < currentRect["x"] + currentRect["width"]) and \
-               (nextRect["y"] < currentRect["y"] + currentRect["height"]) and \
-               (nextRect["y"] + nextRect["height"] > currentRect["y"]):
+            if ((nextRect["x"] < currentRect["x"] + currentRect["width"]) and
+               (nextRect["y"] < currentRect["y"] + currentRect["height"]) and
+               (nextRect["y"] + nextRect["height"] > currentRect["y"]) and
+               not (nextRect["x"] < 28 and nextRect["width"] == 41 and nextRect["height"] < 50)):
 
                 currentRect["width"] = max(currentRect["x"] + currentRect["width"], nextRect["x"] + nextRect["width"]) - currentRect["x"]
                 currentRect["height"] = max(currentRect["y"] + currentRect["height"], nextRect["y"] + nextRect["height"]) - currentRect["y"]
@@ -84,7 +85,7 @@ class OpenCVParse:
       }
       for rectangle in mergedRects:
         x, y, w, h = rectangle
-        if ((x < 28) and ((w == 41 and h < 50) or (w == 55 and h == 27))):
+        if ((x < 28) and ((w == 41 and h < 50))):
           parsedRects["dino"] = {
             "x": x,
             "y": y,
