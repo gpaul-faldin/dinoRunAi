@@ -1,7 +1,9 @@
 import cv2
 from pprint import pprint
 import pytesseract
-import json
+import numpy as np
+from PIL import Image
+import io
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
 
@@ -12,6 +14,10 @@ class OpenCVParse:
     def createMat(self):
       if type(self.imagePath) == str:
         return cv2.imread(self.imagePath)
+      elif isinstance(self.imagePath, bytes):
+        image = Image.open(io.BytesIO(self.imagePath))
+        image_array = np.array(image)
+        return cv2.cvtColor(image_array, cv2.COLOR_RGBA2RGB)
       return cv2.cvtColor(self.imagePath, cv2.COLOR_RGB2BGR)
 
     def writeImage(self, path,  math: cv2.Mat):
