@@ -116,8 +116,6 @@ class OpenCVParse:
         return 0
 
       velocityX = self.info['obstacle'][0]['x'] - dinoAndObstacle['obstacle'][0]['x']
-      if velocityX < 10:
-        velocityX = self.info['obstacle'][1]['x'] - dinoAndObstacle['obstacle'][1]['x']
       return velocityX
 
     def drawRectangle(self):
