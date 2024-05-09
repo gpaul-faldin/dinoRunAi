@@ -6,6 +6,8 @@ from PIL import Image
 import io
 
 pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tesseract.exe'
+pytesseract_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789'
+
 
 class OpenCVParse:
     def __init__(self, imagePath):
@@ -105,15 +107,18 @@ class OpenCVParse:
     def getScore(self):
       originalImage = self.createMat()
       cropped = originalImage[0: 30, 545: 610]
-      score: str = pytesseract.image_to_string(cropped)
+      score: str = pytesseract.image_to_string(cropped, config=pytesseract_config)
       score = score.strip()
-      if (score == '' or int(score) < 5):
+      
+      if (score == '' or int(score) < 10):
         return 0
       return int(score)
 
     def calculateVelocity(self, dinoAndObstacle):
       if self.info == None:
         return 0
+      if not dinoAndObstacle['obstacle']:
+        return self.info['velocity']
 
       velocityX = self.info['obstacle'][0]['x'] - dinoAndObstacle['obstacle'][0]['x']
       return velocityX

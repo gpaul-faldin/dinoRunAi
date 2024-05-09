@@ -7,7 +7,7 @@ import threading
 import time
 
 
-async def runWithPlaywright(frameName, headless = False, commandQueue: Queue = None, dataQueue: Queue = None, resultQueue: Queue = None):
+async def runWithPlaywright(frameName, headless = True, commandQueue: Queue = None, dataQueue: Queue = None, resultQueue: Queue = None):
 
     asyncPWClass = AsyncPWInteraction()
     await asyncPWClass.init()
@@ -21,8 +21,9 @@ async def runWithPlaywright(frameName, headless = False, commandQueue: Queue = N
             openCVClass.imagePath = asyncPWClass.buffer
             info, rectImage, _ = openCVClass.drawRectangle()
             dataQueue.put_nowait(info)
-            # cv2.imshow(frameName, rectImage)
-            # cv2.waitKey(1)
+            if (headless == False):
+              cv2.imshow(frameName, rectImage)
+              cv2.waitKey(1)
             if not commandQueue.empty():
               try:
                 command = commandQueue.get_nowait()
@@ -45,17 +46,12 @@ async def runWithPlaywright(frameName, headless = False, commandQueue: Queue = N
                 resultQueue.put_nowait(score)
                 break
             time.sleep(0.0001)
-        # print("-----------------------------------------------------------------------------------------------")
-        # print(f'frame: {frameName}')
-        # print(f'score: {score}')
-        # print(f'info: {info}')
-        # print("-----------------------------------------------------------------------------------------------")
     finally:
         await asyncPWClass.closeBrowser()
         cv2.destroyAllWindows()
     return 0
 
-def run_in_thread(frameName, headless=False, commandQueue=None, dataQueue=None, resultQueue=None):
+def run_in_thread(frameName, headless=True, commandQueue=None, dataQueue=None, resultQueue=None):
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
@@ -64,11 +60,11 @@ def run_in_thread(frameName, headless=False, commandQueue=None, dataQueue=None, 
     finally:
         loop.close()
 
-def getInstance(name):
+def getInstance(name, headless=True):
   commandQueue = Queue()
   dataQueue = Queue()
   resultQueue = Queue()
-  t = threading.Thread(target=run_in_thread, name=name, args=(name, False, commandQueue, dataQueue, resultQueue))
+  t = threading.Thread(target=run_in_thread, name=name, args=(name, headless, commandQueue, dataQueue, resultQueue))
   return (t, commandQueue, dataQueue, resultQueue)
 
 # instance = getInstance('0')
