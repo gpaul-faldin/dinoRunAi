@@ -28,11 +28,6 @@ class PlaywrightInteraction:
         self.browser.close()
 
 
-
-
-
-
-
 # from playwright.sync_api import sync_playwright
 # import signal
 

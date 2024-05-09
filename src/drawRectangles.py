@@ -10,6 +10,7 @@ pytesseract.pytesseract.tesseract_cmd = r'C:\\Program Files\\Tesseract-OCR\\tess
 class OpenCVParse:
     def __init__(self, imagePath):
       self.imagePath = imagePath
+      self.info = None
 
     def createMat(self):
       if type(self.imagePath) == str:
@@ -110,6 +111,15 @@ class OpenCVParse:
         return 0
       return int(score)
 
+    def calculateVelocity(self, dinoAndObstacle):
+      if self.info == None:
+        return 0
+
+      velocityX = self.info['obstacle'][0]['x'] - dinoAndObstacle['obstacle'][0]['x']
+      if velocityX < 10:
+        velocityX = self.info['obstacle'][1]['x'] - dinoAndObstacle['obstacle'][1]['x']
+      return velocityX
+
     def drawRectangle(self):
 
       originalImage = self.createMat()
@@ -125,11 +135,14 @@ class OpenCVParse:
       except:
         pass
 
-      dinoAndObstacle = self.parseDinoFromObstacle(mergedRects)
+      info = self.parseDinoFromObstacle(mergedRects)
+      
       rectImage = originalImage.copy()
       for rectangle in mergedRects:
         x, y, w, h = rectangle
         rectImage = cv2.rectangle(rectImage, (x, y), (x + w, y + h), (0, 255, 0), 2)
-
-      return [dinoAndObstacle, rectImage, originalImage]
-      #return [originalImage, rectImage, mergedRects]
+      velocity = self.calculateVelocity(info)
+      info['velocity'] = velocity
+      if info['obstacle']:
+        self.info = info
+      return [info, rectImage, originalImage]
