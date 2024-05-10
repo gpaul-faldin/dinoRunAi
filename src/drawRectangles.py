@@ -12,7 +12,8 @@ pytesseract_config = r'--oem 3 --psm 6 -c tessedit_char_whitelist=0123456789'
 class OpenCVParse:
     def __init__(self, imagePath):
       self.imagePath = imagePath
-      self.info = None
+      self.previous_info = None
+      self.frames_with_same_info = 0
 
     def createMat(self):
       if type(self.imagePath) == str:
@@ -76,7 +77,6 @@ class OpenCVParse:
       return boudingRects
 
     def parseDinoFromObstacle(self, mergedRects):
-      
       parsedRects = {
         "dino": {
           "x": 0,
@@ -104,6 +104,20 @@ class OpenCVParse:
           })
       return parsedRects
 
+    def is_info_same_for_30_frames(self, info):
+        if self.previous_info is None:
+            self.previous_info = info
+            return False
+
+        if info == self.previous_info:
+            self.frames_with_same_info += 1
+        else:
+            self.frames_with_same_info = 0
+
+        if self.frames_with_same_info >= 30:
+            return True
+        return False
+
     def getScore(self):
       originalImage = self.createMat()
       cropped = originalImage[0: 30, 545: 610]
@@ -113,15 +127,6 @@ class OpenCVParse:
       if (score == '' or int(score) < 10):
         return 0
       return int(score)
-
-    def calculateVelocity(self, dinoAndObstacle):
-      if self.info == None:
-        return 0
-      if not dinoAndObstacle['obstacle']:
-        return self.info['velocity']
-
-      velocityX = self.info['obstacle'][0]['x'] - dinoAndObstacle['obstacle'][0]['x']
-      return velocityX
 
     def drawRectangle(self):
 
@@ -139,13 +144,16 @@ class OpenCVParse:
         pass
 
       info = self.parseDinoFromObstacle(mergedRects)
-      
       rectImage = originalImage.copy()
       for rectangle in mergedRects:
         x, y, w, h = rectangle
         rectImage = cv2.rectangle(rectImage, (x, y), (x + w, y + h), (0, 255, 0), 2)
-      velocity = self.calculateVelocity(info)
-      info['velocity'] = velocity
-      if info['obstacle']:
-        self.info = info
+
+      if self.is_info_same_for_30_frames(info):
+        info['dino'] = {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0
+        }
       return [info, rectImage, originalImage]

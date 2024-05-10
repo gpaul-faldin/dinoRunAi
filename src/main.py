@@ -20,6 +20,10 @@ async def runWithPlaywright(frameName, headless = True, commandQueue: Queue = No
             await asyncPWClass.captureCanvas()
             openCVClass.imagePath = asyncPWClass.buffer
             info, rectImage, _ = openCVClass.drawRectangle()
+            if (info['dino']['y'] == 0):
+              score = openCVClass.getScore()
+              resultQueue.put_nowait(score)
+              break
             dataQueue.put_nowait(info)
             if (headless == False):
               cv2.imshow(frameName, rectImage)
@@ -31,8 +35,6 @@ async def runWithPlaywright(frameName, headless = True, commandQueue: Queue = No
                   await asyncPWClass.jump()
                 elif command == 'half':
                   await asyncPWClass.jump("half")
-                elif command == 'info':
-                  print(info['dino'])
                 elif command == 'quit':
                   break
               except asyncio.CancelledError:
@@ -41,10 +43,6 @@ async def runWithPlaywright(frameName, headless = True, commandQueue: Queue = No
                 continue
             else:
                 running = True
-            if (info['dino']['y'] == 0):
-                score = openCVClass.getScore()
-                resultQueue.put_nowait(score)
-                break
             time.sleep(0.00001)
     finally:
         await asyncPWClass.closeBrowser()

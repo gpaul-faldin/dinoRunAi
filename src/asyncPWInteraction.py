@@ -25,8 +25,13 @@ class AsyncPWInteraction:
   async def checkSC(self):
     await self.page.screenshot(path="check.png")
 
-  async def captureCanvas(self):
-    self.buffer = await self.page.locator('canvas').screenshot()
+  async def captureCanvas(self, timeout=2):
+    try:
+      self.buffer = await self.page.locator('canvas').screenshot(timeout=timeout)
+    except Exception as e:
+      print('---------------------------------')
+      print('captureCanvas timed out')
+      print('---------------------------------')
 
   async def jump(self, duration="full"):
     if duration == "full":
