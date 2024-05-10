@@ -40,11 +40,19 @@ def main():
         user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
     )
     page: Page = browser.new_page()
-    page.goto("https://trex-runner.com/", wait_until="domcontentloaded")
+    page.goto("file:///A:/Work/AI%20dinoRun/Python/OverlayDinoRun/SiteCopy/test.html", wait_until="domcontentloaded")
     page.mouse.wheel(0, 220)
-    signal.signal(signal.SIGINT, lambda x, y: browser.close())
-    
-    page.screenshot(path="check.png")
+    print("HERE")
+
+
+    # time.sleep(10000)
+
+    test = 0
+    while True:
+      print("AAAAAA")
+      page.screenshot(path=f"{test}check.png")
+      test += 1
+      time.sleep(3)
     print(page.locator("canvas").bounding_box())
     page.screenshot(path="test.png", clip={"x": 100, "y": 67.921875, "width": 620, "height": 150})
     page.keyboard.press(" ")

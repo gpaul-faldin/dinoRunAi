@@ -6,7 +6,6 @@ from queue import Queue
 import time
 import pickle
 import statistics
-import asyncio
 
 import neat.population
 
@@ -18,10 +17,10 @@ class neatSimulation:
     self.population.add_reporter(neat.StdOutReporter(True))
     self.best_genome = None
     self.generation = 0
-  
+
   def runTraining(self):
     self.population.run(self.runFunction)
-  
+
   def calculate_fitness(self, score):
     return score / 10000
 
@@ -30,7 +29,7 @@ class neatSimulation:
     Simuthread.start()
     time.sleep(5)
     command_queue.put('jump')
-    
+
     while Simuthread.is_alive():
 
         if not data_queue.empty():
@@ -41,7 +40,9 @@ class neatSimulation:
           obstacle_x = data['obstacle'][0]['x'] if data['obstacle'] else 0
           obstacle_y = data['obstacle'][0]['y'] if data['obstacle'] else 0
           velocity = data['velocity']
-        
+          
+          print(f"Genome {genome.key} Data: {dino_x}, {dino_y}, {obstacle_x}, {obstacle_y}, {velocity}")
+
           outputs = net.activate((dino_x, dino_y, obstacle_x, obstacle_y, velocity))
 
           if outputs[0] > 0.8:
@@ -68,20 +69,24 @@ class neatSimulation:
   def log_genome(self, genomes):
     fitnesses = [genome.fitness for _, genome in genomes if genome.fitness is not None]
     avg_fitness = sum(fitnesses) / len(fitnesses)
-    rounded_avg_fitness = round(avg_fitness, 4)  # Round average fitness to four decimal places
+    rounded_avg_fitness = round(avg_fitness, 6)  # Round average fitness to four decimal places
 
     std_dev = statistics.stdev(fitnesses) if len(fitnesses) > 1 else 0
 
     best_genome = max(genomes, key=lambda g: g[1].fitness)
     best_genome_object = best_genome[1]
 
-    rounded_std_dev = round(std_dev, 4)  # Round standard deviation to four decimal places
+    rounded_std_dev = round(std_dev, 6)  # Round standard deviation to four decimal places
 
-    filename = f"./dinoRunAi/genome/gen_{self.generation}_fitness{best_genome_object.fitness}_avg_fitness{rounded_avg_fitness}_std_dev{rounded_std_dev}.pkl"
-
-    with open(filename, "wb") as f:
+    if self.generation % 10 == 0:
+      filename = f"./dinoRunAi/genome/gen_{self.generation}_fitness{best_genome_object.fitness}_avg_fitness{rounded_avg_fitness}_std_dev{rounded_std_dev}.pkl"
+      with open(filename, "wb") as f:
         pickle.dump(best_genome_object, f)
+    log_info = f"Generation: {self.generation}, Best Fitness: {best_genome_object.fitness}, Average Fitness: {rounded_avg_fitness}, Standard Deviation: {rounded_std_dev}\n"
+    log_filename = "./dinoRunAi/genome/log.txt"
 
+    with open(log_filename, "a+") as log_file:
+        log_file.write(log_info)
 
   def runFunction(self, genomes, config):
     best_fitness = 0
@@ -109,8 +114,7 @@ class neatSimulation:
     for thread in threads:
         thread.join()
 
-    if self.generation % 10 == 0:
-      self.log_genome(genomes)
+    self.log_genome(genomes)
     self.generation += 1
 
 

@@ -16,8 +16,7 @@ class AsyncPWInteraction:
     self.browser = await self.playwright.chromium.launch(headless=True)
     self.page = await self.browser.new_page()
     await self.page.set_viewport_size({"width": 750, "height": 310})
-    await self.page.goto("https://trex-runner.com/", wait_until="domcontentloaded")
-    await self.page.mouse.wheel(0, 220)
+    await self.page.goto("file:///A:/Work/AI%20dinoRun/Python/OverlayDinoRun/dinoRunAi/SiteCopy/test.html", wait_until="domcontentloaded")
 
   async def closeBrowser(self):
     await self.browser.close()
@@ -27,7 +26,7 @@ class AsyncPWInteraction:
     await self.page.screenshot(path="check.png")
 
   async def captureCanvas(self):
-    self.buffer = await self.page.screenshot(clip={"x": 75, "y": 67.921875, "width": 600, "height": 150})
+    self.buffer = await self.page.locator('canvas').screenshot()
 
   async def jump(self, duration="full"):
     if duration == "full":

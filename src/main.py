@@ -45,7 +45,7 @@ async def runWithPlaywright(frameName, headless = True, commandQueue: Queue = No
                 score = openCVClass.getScore()
                 resultQueue.put_nowait(score)
                 break
-            time.sleep(0.0001)
+            time.sleep(0.00001)
     finally:
         await asyncPWClass.closeBrowser()
         cv2.destroyAllWindows()
@@ -67,7 +67,7 @@ def getInstance(name, headless=True):
   t = threading.Thread(target=run_in_thread, name=name, args=(name, headless, commandQueue, dataQueue, resultQueue))
   return (t, commandQueue, dataQueue, resultQueue)
 
-# instance = getInstance('0')
+# instance = getInstance('0', False)
 # instance[0].start()
 # time.sleep(5)
 # while True:
