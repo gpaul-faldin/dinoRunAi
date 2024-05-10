@@ -104,7 +104,7 @@ class OpenCVParse:
           })
       return parsedRects
 
-    def is_info_same_for_30_frames(self, info):
+    def is_info_same_for_90_frames(self, info):
         if self.previous_info is None:
             self.previous_info = info
             return False
@@ -114,17 +114,23 @@ class OpenCVParse:
         else:
             self.frames_with_same_info = 0
 
-        if self.frames_with_same_info >= 30:
+        if self.frames_with_same_info >= 90:
             return True
         return False
 
     def getScore(self):
       originalImage = self.createMat()
-      cropped = originalImage[0: 30, 545: 610]
+      cropped = originalImage[0: 30, 500: 610]
+      cropped = cv2.cvtColor(cropped, cv2.COLOR_BGR2GRAY)
+      cropped = cv2.GaussianBlur(cropped, (5, 5), 1)
+
       score: str = pytesseract.image_to_string(cropped, config=pytesseract_config)
       score = score.strip()
+      if score == '':
+        return 0
       
-      if (score == '' or int(score) < 10):
+      score = score[5:]
+      if score == '':
         return 0
       return int(score)
 
@@ -149,11 +155,39 @@ class OpenCVParse:
         x, y, w, h = rectangle
         rectImage = cv2.rectangle(rectImage, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
-      if self.is_info_same_for_30_frames(info):
+      if self.is_info_same_for_90_frames(info):
         info['dino'] = {
           "x": 0,
           "y": 0,
           "width": 0,
           "height": 0
         }
+      else:
+        self.previous_info = info
       return [info, rectImage, originalImage]
+
+
+import time
+
+# def main():
+#     aa = 0
+#     openCVClass = OpenCVParse("A:\\Work\\AI dinoRun\\Python\\OverlayDinoRun\\dinoRunAi\\images\\testStuck.png")
+#     score = -1
+#     while True:
+#         print(aa)
+#         aa += 1
+#         openCVClass.imagePath = "A:\\Work\\AI dinoRun\\Python\\OverlayDinoRun\\dinoRunAi\\images\\testStuck.png"
+#         info, rectImage, originalImage = openCVClass.drawRectangle()
+#         cv2.imshow('frame', rectImage)
+#         cv2.waitKey(1)
+#         if (info['dino']['y'] == 0):
+#           score = openCVClass.getScore()
+#           print(score)
+#           break
+#         time.sleep(0.00001)
+
+
+#     cv2.destroyAllWindows()
+#     print(info)
+
+# main()

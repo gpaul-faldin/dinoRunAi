@@ -35,43 +35,45 @@ class neatSimulation:
     while Simuthread.is_alive():
 
         if not data_queue.empty():
-          data = data_queue.get()
+            data = data_queue.get()
 
-          dino_x = data['dino']['x']
-          dino_y = data['dino']['y']
-          dino_width = data['dino']['width']
-          dino_height = data['dino']['height']
-          # distanceToNextObstacle = data['distanceToNextObstacle']
-          obstacles = data['obstacle']
+            dino_x = data['dino']['x']
+            dino_y = data['dino']['y']
+            dino_width = data['dino']['width']
+            dino_height = data['dino']['height']
+            obstacles = data['obstacle']
 
             # Prepare inputs for the neural network
-          inputs = [dino_x, dino_y, dino_width, dino_height]
-          for i in range(3):
-              if i < len(obstacles):
-                  obstacle_x = obstacles[i]['x']
-                  obstacle_y = obstacles[i]['y']
-                  obstacle_width = obstacles[i]['width']
-                  obstacle_distance = obstacle_x - (dino_x + dino_width)
-              else:
-                  obstacle_x = 0
-                  obstacle_y = 0
-                  obstacle_width = 0
-                  obstacle_distance = 0
-              inputs.extend([obstacle_x, obstacle_y, obstacle_width, obstacle_distance])
-          if (monitor == True):
-            print(inputs)
+            inputs = [dino_x, dino_y, dino_width, dino_height]
+            for i in range(3):
+                if i < len(obstacles):
+                    obstacle_x = obstacles[i]['x']
+                    obstacle_y = obstacles[i]['y']
+                    obstacle_width = obstacles[i]['width']
+                    obstacle_distance = obstacle_x - (dino_x + dino_width)
+                    if i + 1 < len(obstacles):
+                        next_obstacle_x = obstacles[i + 1]['x']
+                        distance_between_obstacles = next_obstacle_x - (obstacle_x + obstacle_width)
+                    else:
+                        distance_between_obstacles = 0
+                else:
+                    obstacle_x = 0
+                    obstacle_y = 0
+                    obstacle_width = 0
+                    obstacle_distance = 0
+                    distance_between_obstacles = 0
+                inputs.extend([obstacle_x, obstacle_y, obstacle_width, obstacle_distance, distance_between_obstacles])
+            outputs = net.activate(inputs)
 
-          outputs = net.activate(inputs)
+            if outputs[0] > 0.8:
+                command = 'jump'
+            elif outputs[0] > 0.5:
+                command = 'half-jump'
+            else:
+                command = ''
 
-          if outputs[0] > 0.8:
-              command = 'jump'
-          elif outputs[0] > 0.5:
-              command = 'half-jump'
-          else:
-              command = ''
-
-          if command != '':
-            command_queue.put(command)
+            if command != '':
+                command_queue.put(command)
         time.sleep(0.00001)
 
     # Get the final score from the result queue

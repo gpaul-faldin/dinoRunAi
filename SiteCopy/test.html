@@ -440,9 +440,9 @@
 						}
 						var playAcheivementSound = this.distanceMeter.update(deltaTime,
 							Math.ceil(this.distanceRan));
-						if (playAcheivementSound) {
-							this.playSound(this.soundFx.SCORE);
-						}
+						//if (playAcheivementSound) {
+						//	this.playSound(this.soundFx.SCORE);
+						//}
 					}
 					if (!this.crashed) {
 						this.tRex.update(deltaTime);
@@ -514,7 +514,7 @@
 								this.activated = true;
 							}
 							if (!this.tRex.jumping) {
-								this.playSound(this.soundFx.BUTTON_PRESS);
+								//this.playSound(this.soundFx.BUTTON_PRESS);
 								this.tRex.startJump();
 							}
 						}
@@ -575,7 +575,7 @@
 				* Game over state.
 				*/
 				gameOver: function () {
-					this.playSound(this.soundFx.HIT);
+					//this.playSound(this.soundFx.HIT);
 					vibrate(200);
 					this.stop();
 					this.crashed = true;
@@ -626,7 +626,7 @@
 						this.distanceMeter.reset(this.highestScore);
 						this.horizon.reset();
 						this.tRex.reset();
-						this.playSound(this.soundFx.BUTTON_PRESS);
+						//this.playSound(this.soundFx.BUTTON_PRESS);
 						this.update();
 					}
 				},
@@ -644,14 +644,14 @@
 				* Play a sound.
 				* @param {SoundBuffer} soundBuffer
 				*/
-				playSound: function (soundBuffer) {
-					if (soundBuffer) {
-						var sourceNode = this.audioContext.createBufferSource();
-						sourceNode.buffer = soundBuffer;
-						sourceNode.connect(this.audioContext.destination);
-						sourceNode.start(0);
-					}
-				}
+				//playSound: function (soundBuffer) {
+				//	if (soundBuffer) {
+				//		var sourceNode = this.audioContext.createBufferSource();
+				//		sourceNode.buffer = soundBuffer;
+				//		sourceNode.connect(this.audioContext.destination);
+				//		sourceNode.start(0);
+				//	}
+				//}
 			};
 			/**
 			* Updates the canvas size taking into
@@ -1501,7 +1501,7 @@
 				*/
 				update: function (deltaTime, distance) {
 					var paint = true;
-					var playSound = false;
+					//var playSound = false;
 					if (!this.acheivement) {
 						distance = this.getActualDistance(distance);
 						if (distance > 0) {
@@ -1510,7 +1510,7 @@
 								// Flash score and play sound.
 								this.acheivement = true;
 								this.flashTimer = 0;
-								playSound = true;
+								//playSound = true;
 							}
 							// Create a string representation of the distance with leading 0.
 							var distanceStr = (this.defaultString +
@@ -1543,7 +1543,7 @@
 						}
 					}
 					this.drawHighScore();
-					return playSound;
+					//return playSound;
 				},
 				/**
 				* Draw the high score.

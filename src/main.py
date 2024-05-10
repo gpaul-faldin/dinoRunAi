@@ -43,7 +43,7 @@ async def runWithPlaywright(frameName, headless = True, commandQueue: Queue = No
                 continue
             else:
                 running = True
-            time.sleep(0.00001)
+            time.sleep(0.0001)
     finally:
         await asyncPWClass.closeBrowser()
         cv2.destroyAllWindows()
