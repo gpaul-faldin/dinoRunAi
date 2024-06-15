@@ -1,0 +1,8 @@
+opencv-python
+pytesseract
+playwright
+asyncio
+queue
+threading
+time
+neat-python
